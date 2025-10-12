@@ -2,9 +2,10 @@ package typeid
 
 import (
 	"fmt"
-	"github.com/oklog/ulid/v2"
 	"regexp"
 	"strings"
+
+	"github.com/oklog/ulid/v2"
 )
 
 type TypeId string
@@ -37,7 +38,7 @@ func Make(typeName string) (TypeId, error) {
 	if err := validateTypeName(typeName); err != nil {
 		return "", err
 	}
-	
+
 	return TypeId(fmt.Sprintf("%s_%s", typeName, strings.ToLower(ulid.Make().String()))), nil
 }
 
@@ -45,20 +46,20 @@ func Parse(typeName string, typeId string) (TypeId, error) {
 	if err := validateTypeName(typeName); err != nil {
 		return "", err
 	}
-	
+
 	typeIdParts := strings.SplitN(typeId, "_", 2)
 	if len(typeIdParts) != 2 {
 		return "", fmt.Errorf("type id must contain exactly one underscore separating type and ulid")
 	}
-	
+
 	if typeIdParts[0] != typeName {
 		return "", fmt.Errorf("type id prefix '%s' does not match expected type name '%s'", typeIdParts[0], typeName)
 	}
-	
+
 	if _, err := ulid.Parse(strings.ToUpper(typeIdParts[1])); err != nil {
 		return "", fmt.Errorf("invalid ulid '%s': %w", typeIdParts[1], err)
 	}
-	
+
 	return TypeId(typeId), nil
 }
 
